@@ -1,0 +1,139 @@
+<html>
+<head>
+<title>Simple Slideshow</title>
+<style>
+	body, html {
+		margin: 0;
+		padding: 0;
+		height: 100%;
+		overflow: hidden;
+	}
+	#slideshow {
+		width: 100%;
+		height: 100%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		background-color: #000;
+	}
+	#slide {
+		max-width: 100%;
+		max-height: 100%;
+		object-fit: contain;
+	}
+	#curIndex {
+		position: fixed;
+		top: 10px;
+		right: 10px;
+		background-color: rgba(0, 0, 0, 0.5);
+		padding: 5px 10px;
+		border-radius: 5px;
+		color: white;
+		font-family: Arial, sans-serif;
+	}
+</style>
+</head>
+<body>
+<div id="slideshow">
+	<img id="slide" src="" alt="Slideshow Image">
+</div>
+<div id="curIndex"></div>
+<div style="position: fixed; top: 10px; left: 10px;" onclick="reset(); if (event.target.id.indexOf('proxy')===-1) document.getElementById(event.target.id).addEventListener('change', handleImage, false);">
+	<label id="proxyFolderLoader" class="setting" for="folderLoader" style="display: block; cursor: pointer; color: white;">Choose Folder</label>
+	<input type="file" id="folderLoader" class="setting" name="imageLoader[]" webkitdirectory directory multiple accept="image/*" style="display: none;"/>
+	<!--button id="folderLoaderProxy" class="setting" onclick="document.getElementById(this.id.slice(0, -5)).click()">Choose Folder</button-->
+	<br>
+	<label id="proxyFilesLoader" class="setting" for="filesLoader" style="display: block; cursor: pointer; color: white;">Choose Files</label>
+	<input type="file" id="filesLoader" class="setting" name="imageLoader[]" multiple accept="image/*" style="display: none;"/>
+	<!--button id="filesLoaderProxy" class="setting" onclick="document.getElementById(this.id.slice(0, -5)).click()">Choose Files</button-->
+</div>
+
+<script>
+window.onload = function() {
+	const foundProxy = document.querySelector(".setting[id*='roxy']");
+	if (foundProxy) {
+		document.getElementById('folderLoader').style.display = 'none';
+		document.getElementById('filesLoader').style.display = 'none';
+	}else{
+		document.getElementById('folderLoader').style.display = 'block';
+		document.getElementById('filesLoader').style.display = 'block';
+	}
+};
+
+const images = [];
+let currentIndex = 0;
+let isPlaying = true;
+let intervalId;
+
+const slideElement = document.getElementById('slide');
+
+function handleImage(e) {
+	let files = e.target.files;
+	for (let i = 0; i < files.length; i++) {
+		let file = files[i];
+		if (!file.type.startsWith('image/')) continue; // Skip non-image files
+		let url = URL.createObjectURL(file);
+		images.push(url);
+	}
+	if (images.length) { // If any images are loaded
+		currentIndex = images.length - 1;
+		startSlideshow();
+	}
+	document.getElementById(e.target.id).removeEventListener('change', handleImage, false);
+}
+
+function showNextSlide() {
+	currentIndex = (currentIndex + 1) % images.length;
+	slideElement.src = images[currentIndex];
+	curIndex.innerText = currentIndex + 1;
+}
+
+function showPrevSlide() {
+	currentIndex = (currentIndex - 1 + images.length) % images.length;
+	slideElement.src = images[currentIndex];
+	curIndex.innerText = currentIndex + 1;
+}
+
+function togglePlayPause() {
+	isPlaying = !isPlaying;
+	if (isPlaying) {
+		if (images.length) startSlideshow();
+	} else {
+		stopSlideshow();
+	}
+}
+
+function startSlideshow() {
+	showNextSlide();
+	intervalId = setInterval(showNextSlide, 5000);
+}
+
+function stopSlideshow() {
+	clearInterval(intervalId);
+}
+
+function reset() {
+	stopSlideshow();
+	images.length = 0;
+	currentIndex = 0;
+	slideElement.src = "";
+	curIndex.innerText = 0;
+}
+
+document.addEventListener('keydown', (event) => {
+	if (event.code === 'Space') {
+		if (!event.target.closest(".setting")) togglePlayPause();
+	} else if (event.code === 'ArrowRight') {
+		if (images.length) showNextSlide();
+	} else if (event.code === 'ArrowLeft') {
+		if (images.length) showPrevSlide();
+	}
+});
+
+document.addEventListener('click', (event) => {
+	if (!event.target.closest(".setting")) togglePlayPause();
+});
+
+</script>
+</body>
+</html>
