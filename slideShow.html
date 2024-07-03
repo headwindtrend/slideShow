@@ -30,6 +30,10 @@
 		border-radius: 5px;
 		color: white;
 		font-family: Arial, sans-serif;
+		cursor: pointer;
+	}
+	.red-border {
+		border: 1px solid red;
 	}
 </style>
 </head>
@@ -37,7 +41,7 @@
 <div id="slideshow">
 	<img id="slide" src="" alt="Slideshow Image">
 </div>
-<div id="curIndex"></div>
+<div id="curIndex" class="setting" onclick="this.classList.toggle('red-border');if (this.classList.contains('red-border')) showNextSlide();"></div>
 <div style="position: fixed; top: 10px; left: 10px;" onclick="reset(); if (event.target.id.indexOf('proxy')===-1) document.getElementById(event.target.id).addEventListener('change', handleImage, false);">
 	<label id="proxyFolderLoader" class="setting" for="folderLoader" style="display: block; cursor: pointer; color: white;">Choose Folder</label>
 	<input type="file" id="folderLoader" class="setting" name="imageLoader[]" webkitdirectory directory multiple accept="image/*" style="display: none;"/>
@@ -60,8 +64,8 @@ window.onload = function() {
 	}
 };
 
-const images = [];
-let currentIndex = 0;
+const rHist = [], images = [];
+let ranIndex = currentIndex = 0;
 let isPlaying = true;
 let intervalId;
 
@@ -83,13 +87,34 @@ function handleImage(e) {
 }
 
 function showNextSlide() {
-	currentIndex = (currentIndex + 1) % images.length;
+	if (curIndex.classList.contains("red-border")) {
+		// if ranIndex is currently pointing at the last array member of rHist, generate a random index out of the images pool
+		if (!rHist.length || ranIndex === rHist.length - 1){
+			let nextIndex = currentIndex;
+			while (nextIndex === currentIndex) {
+				nextIndex = Math.floor(Math.random()*images.length);
+			}currentIndex = nextIndex;	// updates currentIndex
+			rHist.push(currentIndex);	// stacks the newly generated index
+			if (rHist.length > 1000) rHist.shift();	// impose a max cap
+			ranIndex = rHist.length - 1;	// updates ranIndex
+		}else{
+			ranIndex = (ranIndex + 1) % rHist.length;	// updates ranIndex
+			currentIndex = rHist[ranIndex];	// updates currentIndex
+		}
+	}else{
+		currentIndex = (currentIndex + 1) % images.length;
+	}
 	slideElement.src = images[currentIndex];
 	curIndex.innerText = currentIndex + 1;
 }
 
 function showPrevSlide() {
-	currentIndex = (currentIndex - 1 + images.length) % images.length;
+	if (curIndex.classList.contains("red-border")) {
+		ranIndex = (ranIndex - 1 + rHist.length) % rHist.length;	// updates ranIndex
+		currentIndex = rHist[ranIndex];	// updates currentIndex
+	}else{
+		currentIndex = (currentIndex - 1 + images.length) % images.length;
+	}
 	slideElement.src = images[currentIndex];
 	curIndex.innerText = currentIndex + 1;
 }
@@ -114,8 +139,8 @@ function stopSlideshow() {
 
 function reset() {
 	stopSlideshow();
-	images.length = 0;
-	currentIndex = 0;
+	rHist.length = images.length = 0;
+	ranIndex = currentIndex = 0;
 	slideElement.src = "";
 	curIndex.innerText = 0;
 }
