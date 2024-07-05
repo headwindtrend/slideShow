@@ -41,8 +41,8 @@
 <div id="slideshow">
 	<img id="slide" src="" alt="Slideshow Image">
 </div>
-<div id="curIndex" class="setting" onclick="if (poolSize() > 2) {this.classList.toggle('red-border');if (this.classList.contains('red-border')) showNextSlide();}"></div>
-<div style="position: fixed; top: 10px; left: 10px;" onclick="reset(); if (event.target.id.toLowerCase().indexOf('proxy')===-1) document.getElementById(event.target.id).addEventListener('change', handleImage, false);">
+<div id="curIndex" class="setting" onclick="if (poolSize() > 2) {this.classList.toggle('red-border');if (this.classList.contains('red-border')) showNextSlide();}" oncontextmenu="this.style.display = 'none'; return false"></div>
+<div id="loaders" style="position: fixed; top: 10px; left: 10px;" onclick="reset(); if (event.target.id.toLowerCase().indexOf('proxy')===-1) document.getElementById(event.target.id).addEventListener('change', handleImage, false);">
 	<label id="proxyFolderLoader" class="setting" for="folderLoader" style="display: block; cursor: pointer; color: white;">Choose Folder</label>
 	<input type="file" id="folderLoader" class="setting" name="imageLoader[]" webkitdirectory directory multiple accept="image/*" style="display: none;"/>
 	<!--button id="folderLoaderProxy" class="setting" onclick="document.getElementById(this.id.slice(0, -5)).click()">Choose Folder</button-->
@@ -131,10 +131,13 @@ function togglePlayPause() {
 function startSlideshow() {
 	showNextSlide();
 	intervalId = setInterval(showNextSlide, 5000);
+	loaders.style.display = "none";
 }
 
 function stopSlideshow() {
 	clearInterval(intervalId);
+	loaders.style.display = "block";
+	curIndex.style.display = "block";
 }
 
 function reset() {
