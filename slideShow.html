@@ -73,7 +73,7 @@ window.onload = function() {
 const rHist = [], images = [];
 let ranIndex = currentIndex = 0;
 let isPlaying = true;
-let intervalId;
+const intervalIds = [];
 
 const slideElement = document.getElementById('slide');
 
@@ -135,14 +135,17 @@ function togglePlayPause() {
 }
 
 function startSlideshow() {
+	if (!isPlaying) isPlaying = true;
 	showNextSlide();
-	intervalId = setInterval(showNextSlide, 5000);
+	const intervalId = setInterval(showNextSlide, 5000);
+	if (!intervalIds.includes(intervalId)) intervalIds.push(intervalId);
 	loaders.style.display = "none";
 	excludeImage.style.display = "none";
 }
 
 function stopSlideshow() {
-	clearInterval(intervalId);
+	if (isPlaying) isPlaying = false;
+	intervalIds.forEach(intervalId => clearInterval(intervalId));
 	loaders.style.display = "block";
 	curIndex.style.display = "block";
 	excludeImage.style.display = "block";
