@@ -10,7 +10,7 @@ a slideshow feature in html
 
 Change log:
 
-* Jul 9, 2024&nbsp;&nbsp;&nbsp;&nbsp;added a feature to exclude the current image from the slideshow.
+* Jul 9, 2024&nbsp;&nbsp;&nbsp;&nbsp;added a feature to exclude the current image from the slideshow. and made some adjustments. not because there are any problems encountered, but these can make it more robust anyway.
 
 * Jul 5, 2024&nbsp;&nbsp;&nbsp;&nbsp;cosmetic tweaks: the "loader" controls were always shown. from now on, they will be hidden in "play" mode, and shown only in "pause" mode. the "index number" control on the other hand, with some flexibility, yet still can be hidden if necessary. a rightclick on it can dismiss it. and, "pause" mode will bring all controls back (shown), including "index number".
 
