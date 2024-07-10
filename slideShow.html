@@ -43,7 +43,7 @@
 </style>
 </head>
 <body>
-<div id="slideshow">
+<div id="slideshow" ondrop="handleDrop(event)" ondragover="event.preventDefault()">
 	<img id="slide" src="" alt="Slideshow Image">
 </div>
 <div id="curIndex" class="setting" onclick="if (poolSize() > 2) {this.classList.toggle('red-border');if (this.classList.contains('red-border')) showNextSlide();}" oncontextmenu="this.style.display = 'none'; return false"></div>
@@ -74,6 +74,7 @@ const rHist = [], images = [];
 let ranIndex = currentIndex = 0;
 let isPlaying = true;
 const intervalIds = [];
+const sources = {Loaded: ""};
 
 const slideElement = document.getElementById('slide');
 
@@ -83,6 +84,7 @@ function handleImage(e) {
 		let file = files[i];
 		if (!file.type.startsWith('image/')) continue; // Skip non-image files
 		let url = URL.createObjectURL(file);
+		sources.Loaded += file.name + " " + file.size.toString() + " " + file.type + String.fromCharCode(9) + url + String.fromCharCode(10);
 		images.push(url);
 	}
 	if (images.length) { // If any images are loaded
@@ -90,6 +92,60 @@ function handleImage(e) {
 		startSlideshow();
 	}
 	document.getElementById(e.target.id).removeEventListener('change', handleImage, false);
+}
+
+function handleDrop(event) {
+	event.preventDefault();
+	const html = event.dataTransfer.getData('text/html');
+	const files = event.dataTransfer.files;
+	let loadPromises = [];
+	let nextIndex;
+	let bingo = false;
+	if (html) {
+		const parser = new DOMParser();
+		const doc = parser.parseFromString(html, 'text/html');
+		const imgs = doc.getElementsByTagName('img');
+		if (imgs.length) {
+			bingo = true;
+			nextIndex = images.length;
+			loadPromises = Array.from(imgs).map(img => loadImage(img.src));
+		}
+	} else if (files.length) {
+		bingo = true;
+		nextIndex = images.length;
+		loadPromises = Array.from(files).filter(file => file.type.startsWith('image/')).map(file => loadImage(URL.createObjectURL(file), file.name + " " + file.size.toString() + " " + file.type + String.fromCharCode(9)));
+	}
+	if (bingo) {
+		Promise.all(loadPromises).then(() => {
+			if (images.length > nextIndex) {
+				currentIndex = nextIndex;
+				slideElement.src = images[currentIndex];
+				curIndex.innerText = currentIndex + 1;
+			}
+		});
+	}
+	function loadImage(src, prefix=false) {
+		return new Promise((resolve, reject) => {
+			const testImage = new Image();
+			testImage.onload = function() {
+				if (!sources.Loaded.includes(src) && (prefix ? !sources.Loaded.includes(prefix) : true)) {
+					if (prefix) sources.Loaded += prefix;
+					sources.Loaded += src + String.fromCharCode(10);
+					images.push(src);
+				}
+				clearTimeout(this.timeoutId); resolve();
+			};
+			testImage.onerror = function() {
+				console.error('Failed to load image:', src);
+				clearTimeout(this.timeoutId); resolve();
+			};
+			testImage.src = src;
+			testImage.timeoutId = setTimeout(() => {
+				console.error('Image load timed out:', src);
+				resolve();
+			}, 5000);
+		});
+	}
 }
 
 function showNextSlide() {
@@ -155,6 +211,7 @@ function reset() {
 	stopSlideshow();
 	rHist.length = images.length = 0;
 	ranIndex = currentIndex = 0;
+	sources.Loaded = "";
 	slideElement.src = "";
 	curIndex.innerText = 0;
 }
@@ -166,7 +223,14 @@ function poolSize() {
 function removeCurImage() {
 	rHist.length = ranIndex = 0;
 	if (curIndex.classList.contains("red-border")) curIndex.classList.toggle('red-border');
+	removeItemInSourcesLoaded(images[currentIndex]);
 	images.splice(currentIndex, 1);
+	function removeItemInSourcesLoaded(url) {
+		const tab = String.fromCharCode(9);
+		const nl = String.fromCharCode(10);
+		const lm = String.fromCharCode(92);
+		sources.Loaded = sources.Loaded.replace( RegExp( "(?<=^|" + nl + ")(?:[^" + tab + nl + "]+" + tab + ")?" + url.replace( RegExp( lm + "W", "g"), lm + "$&") + nl), "");
+	}
 }
 
 document.addEventListener('keydown', (event) => {
