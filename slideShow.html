@@ -22,10 +22,10 @@
 		object-fit: contain;
 	}
 	#curIndex {
+		position: fixed;
 		top: 10px;
 	}
-	#curIndex, #excludeImage {
-		position: fixed;
+	#curIndex, #excludeImage, .indexNum {
 		right: 10px;
 		background-color: rgba(0, 0, 0, 0.5);
 		padding: 5px 10px;
@@ -37,8 +37,53 @@
 	.red-border {
 		border: 1px solid red;
 	}
+	.indexNum {
+		position: absolute;
+	}
 	#excludeImage {
+		position: fixed;
+	}
+	#excludeImage, .indexNum {
 		bottom: 10px;
+	}
+	.hide{
+		display: none;
+	}
+	#thumbnailsOuterContainer {
+		position: fixed;
+		width: 95%;
+		height: 95%;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		border: 5px solid chocolate;
+		background: mediumseagreen;
+		overflow: auto;
+		z-index: 1;
+	}
+	#top-text, #bottom-text {
+		width: 100%;
+		text-align: center;
+		white-space: nowrap;
+		background: mediumseagreen;
+		font-weight: bold;
+		color: chocolate;
+		white-space: pre;
+		overflow: hidden;
+	}
+	#bottom-text {
+		padding-top: 5px;
+	}
+	.thumbnail {
+		display: inline-flex;
+		flex-flow: column;
+		width: 100%;
+		max-width: 320px;
+		background: mediumseagreen;
+		padding-top: 5px;
+		padding-left: 5px;
+		position: relative;
+		text-decoration: none;
 	}
 </style>
 </head>
@@ -46,8 +91,22 @@
 <div id="slideshow" ondrop="handleDrop(event)" ondragover="event.preventDefault()">
 	<img id="slide" src="" alt="Slideshow Image">
 </div>
+<div id="thumbnailsOuterContainer" class="setting hide" ondragstart="handleDragStart(event)" ondrop="thumbnailDrop(event)" ondragover="event.preventDefault()">
+	<div id="top-text"> Top Top Top Top Top Top Top Top Top Top Top Top Top Top Top Top Top Top Top Top Top Top Top Top Top Top Top Top Top Top Top Top Top Top Top </div>
+	<div id="thumbnailsContainer" onclick="event.preventDefault(); event.stopPropagation(); const oc = thumbnailsOuterContainer; if (event.target.closest('.thumbnail')) {currentIndex = Array.from(this.querySelectorAll('.thumbnail')).indexOf(event.target.closest('.thumbnail')); slideElement.src = event.target.closest('.thumbnail img').src; curIndex.innerText = currentIndex + 1; if (curIndex.classList.contains('red-border')) {if (!rHist.length || ranIndex === rHist.length - 1) {ranIndex = rHist.length; rHist.push(currentIndex);} else {rHist.splice(ranIndex + 1, 0, currentIndex); ranIndex = (ranIndex + 1) % rHist.length;} if (rHist.length > 100) rHist.shift();}; oc.classList.toggle('hide'); if (!isPlaying) greenSpot.classList.toggle('hide'); if (isPlaying) stopSlideshow();} else {if (event.clientY <= document.body.clientHeight / 2) {oc.scrollTop = 0;} else {oc.scrollTop = oc.scrollHeight;}}"></div>
+	<div id="bottom-text"> Bottom Bottom Bottom Bottom Bottom Bottom Bottom Bottom Bottom Bottom Bottom Bottom Bottom Bottom Bottom Bottom Bottom Bottom Bottom Bottom </div>
+	<svg id="darkSpot" width="100" height="100" onmouseenter="this.querySelector('circle').style.fillOpacity = 1;" onmouseleave="this.querySelector('circle').style.fillOpacity = .2;" onclick="thumbnailsOuterContainer.classList.toggle('hide'); if (!isPlaying) greenSpot.classList.toggle('hide');" ontouchstart="this.setAttribute('starting-x', event.touches[0].clientX); this.setAttribute('starting-y', event.touches[0].clientY);" ontouchmove="const dx = event.touches[0].clientX - this.getAttribute('starting-x'); const dy = event.touches[0].clientY - this.getAttribute('starting-y'); const di = Math.sqrt(dx * dx + dy * dy); const newScale = Math.min(Math.max(0, Math.round(di / 25)), 40); if (newScale) {event.stopPropagation(); event.preventDefault(); changeThumbnailsSize(newScale)}" style=" position: fixed; top: 50%; transform: translateY(-50%); right: 0;">
+		<circle cx="50" cy="50" r="50" style="fill: black; fill-opacity: .2"/>
+		<text x="50%" y="50%" dy=".4em" text-anchor="middle" style="cursor: pointer; font: bold 30px sans-serif; fill: chocolate; fill-opacity: .5"></text>
+		<title>Click me to close; mouse-wheel/touch-drag me to resize thumbnails.</title>
+	</svg>
+</div>
+<svg id="greenSpot" class="setting" width="100" height="100" onmouseenter="this.querySelector('circle').style.fillOpacity = 1;" onmouseleave="this.querySelector('circle').style.fillOpacity = .2;" onclick="thumbnailsOuterContainer.classList.toggle('hide'); this.classList.toggle('hide');" style=" position: fixed; top: 50%; transform: translateY(-50%); right: 0;">
+	<circle cx="50" cy="50" r="50" style="fill: mediumseagreen; fill-opacity: .2"/>
+	<title>Click me to open the thumbnails panel.</title>
+</svg>
 <div id="curIndex" class="setting" onclick="if (poolSize() > 2) {this.classList.toggle('red-border');if (this.classList.contains('red-border')) showNextSlide();}" oncontextmenu="this.style.display = 'none'; return false"></div>
-<div id="excludeImage" class="setting" onclick="removeCurImage(); if (poolSize()) {showPrevSlide(); showNextSlide()} else {reset()}">Exclude</div>
+<div id="excludeImage" class="setting" onclick="removeImage(currentIndex); if (poolSize()) {showPrevSlide(); showNextSlide()} else {reset()}">Exclude</div>
 <div id="loaders" style="position: fixed; top: 10px; left: 10px;" onclick="reset(); if (event.target.id.toLowerCase().indexOf('proxy')===-1) document.getElementById(event.target.id).addEventListener('change', handleImage, false);">
 	<label id="proxyFolderLoader" class="setting" for="folderLoader" style="display: block; cursor: pointer; color: white;">Choose Folder</label>
 	<input type="file" id="folderLoader" class="setting" name="imageLoader[]" webkitdirectory directory multiple accept="image/*" style="display: none;"/>
@@ -75,6 +134,7 @@ let ranIndex = currentIndex = 0;
 let isPlaying = true;
 const intervalIds = [];
 const sources = {Loaded: ""};
+let scale = 0.375; thumbnailsOuterContainer.querySelector("svg text").textContent = (scale * 100) + "%";
 
 const slideElement = document.getElementById('slide');
 
@@ -85,7 +145,7 @@ function handleImage(e) {
 		if (!file.type.startsWith('image/')) continue; // Skip non-image files
 		let url = URL.createObjectURL(file);
 		sources.Loaded += file.name + " " + file.size.toString() + " " + file.type + String.fromCharCode(9) + url + String.fromCharCode(10);
-		images.push(url);
+		loadImageSub(url);
 	}
 	if (images.length) { // If any images are loaded
 		currentIndex = images.length - 1;
@@ -94,7 +154,7 @@ function handleImage(e) {
 	document.getElementById(e.target.id).removeEventListener('change', handleImage, false);
 }
 
-function handleDrop(event) {
+function handleDrop(event, lotp=false) {
 	event.preventDefault();
 	const html = event.dataTransfer.getData('text/html');
 	const files = event.dataTransfer.files;
@@ -122,6 +182,7 @@ function handleDrop(event) {
 				slideElement.src = images[currentIndex];
 				curIndex.innerText = currentIndex + 1;
 			}
+			if (lotp) updateIndexNums();
 		});
 	}
 	function loadImage(src, prefix=false) {
@@ -131,7 +192,7 @@ function handleDrop(event) {
 				if (!sources.Loaded.includes(src) && (prefix ? !sources.Loaded.includes(prefix) : true)) {
 					if (prefix) sources.Loaded += prefix;
 					sources.Loaded += src + String.fromCharCode(10);
-					images.push(src);
+					loadImageSub(src, lotp);
 				}
 				clearTimeout(this.timeoutId); resolve();
 			};
@@ -148,16 +209,112 @@ function handleDrop(event) {
 	}
 }
 
+function loadImageSub(src, lotp=false) {
+	const newImgDiv = document.createElement("div");
+	if (lotp) {
+		thumbnailsContainer.insertBefore(newImgDiv, lotp.domRef);
+		images.splice(lotp.imgIndex, 0, src);
+	} else {
+		thumbnailsContainer.appendChild(newImgDiv);
+		images.push(src);
+	}
+	newImgDiv.setAttribute("class", "thumbnail");
+	const newImgEle = document.createElement("img");
+	newImgDiv.appendChild(newImgEle);
+	newImgEle.setAttribute("src", src);
+	const newIndex = document.createElement("div");
+	newImgDiv.appendChild(newIndex);
+	newIndex.setAttribute("class", "indexNum");
+	newIndex.innerText = Array.from(thumbnailsContainer.querySelectorAll(".thumbnail")).indexOf(newImgDiv) + 1;
+}
+
+function updateIndexNums() {
+	Array.from(thumbnailsContainer.querySelectorAll(".thumbnail")).forEach((thumbnail, index) => {
+		thumbnail.querySelector(".indexNum").innerText = index + 1;
+	});
+}
+
+function handleDragStart(event) {
+	const ctnr = thumbnailsContainer;
+	if (event.target.closest(".thumbnail")) {
+		ctnr.dataset.fromMyself = images.indexOf(event.target.closest(".thumbnail img").src);
+	}else if (ctnr.dataset.fromMyself) {
+		ctnr.removeAttribute("data-from-myself");
+	}
+}
+
+function thumbnailDrop(event) {
+	let bingo = false;
+	const ctnr = thumbnailsContainer;
+	let finaltarget = event.target.closest(".thumbnail"), targetIndex;
+	if (finaltarget) {
+		bingo = true;
+		targetIndex = images.indexOf(finaltarget.querySelector("img").src);
+		if (ctnr.dataset.fromMyself && targetIndex == ctnr.dataset.fromMyself) {
+			const rect=finaltarget.getBoundingClientRect();
+			if (event.clientX < rect.left + (rect.right - rect.left) / 3 && event.clientY < rect.top + (rect.bottom - rect.top) / 3) {
+				finaltarget = ctnr.querySelector("div:first-child");
+				targetIndex = 0;
+			} else if ( event.clientX > rect.right - (rect.right - rect.left) / 3 && event.clientY > rect.bottom - (rect.bottom - rect.top) / 3) {
+				finaltarget = ctnr.querySelector("div:last-child").nextSibling;
+				targetIndex = images.length;
+			}
+		}
+	} else if (event.target.closest("#thumbnailsContainer")) {
+		bingo = true;
+		if (ctnr.dataset.fromMyself) {
+			finaltarget = "<=> to remove the dragged thumbnail <=>";
+			targetIndex = -1;
+		} else if (ctnr.childElementCount) {
+			if (event.clientY <= document.body.clientHeight / 2) {
+				finaltarget = ctnr.querySelector("div:first-child");
+				targetIndex = 0;
+			} else {
+				finaltarget = ctnr.querySelector("div:last-child").nextSibling;
+				targetIndex = images.length;
+			}
+		} else {
+			finaltarget = "<=> to append the dragged items <=>";
+			targetIndex = images.length;
+		}
+	}
+	if (bingo) {
+		event.preventDefault(); event.stopPropagation();
+		if (ctnr.dataset.fromMyself && targetIndex === -1) {
+			removeImage(ctnr.dataset.fromMyself);
+		} else if (ctnr.childElementCount) {
+			zapRandomModeIfAny();
+			if (ctnr.dataset.fromMyself) {
+				ctnr.insertBefore(ctnr.querySelector(`img[src="${images[ctnr.dataset.fromMyself]}"]`).parentNode, finaltarget);
+				if (targetIndex > ctnr.dataset.fromMyself) {
+					images.splice(targetIndex, 0, images[ctnr.dataset.fromMyself]);
+					images.splice(ctnr.dataset.fromMyself, 1);
+				} else {
+					const tempHolder = images[ctnr.dataset.fromMyself];
+					images.splice(ctnr.dataset.fromMyself, 1);
+					images.splice(targetIndex, 0, tempHolder);
+				}
+				updateIndexNums();
+			} else {
+				handleDrop(event, {domRef: finaltarget, imgIndex: targetIndex});
+			}
+		} else {
+			handleDrop(event);
+		}
+		ctnr.removeAttribute("data-from-myself");
+	}
+}
+
 function showNextSlide() {
 	if (curIndex.classList.contains("red-border")) {
 		// if ranIndex is currently pointing at the last array member of rHist, generate a random index out of the images pool
-		if (!rHist.length || ranIndex === rHist.length - 1){
+		if (!rHist.length || ranIndex === rHist.length - 1) {
 			let nextIndex = currentIndex;
 			while (nextIndex === currentIndex) {
 				nextIndex = Math.floor(Math.random()*images.length);
 			}currentIndex = nextIndex;	// updates currentIndex
 			rHist.push(currentIndex);	// stacks the newly generated index
-			if (rHist.length > 1000) rHist.shift();	// impose a max cap
+			if (rHist.length > 100) rHist.shift();	// impose a max cap
 			ranIndex = rHist.length - 1;	// updates ranIndex
 		}else{
 			ranIndex = (ranIndex + 1) % rHist.length;	// updates ranIndex
@@ -197,6 +354,7 @@ function startSlideshow() {
 	if (!intervalIds.includes(intervalId)) intervalIds.push(intervalId);
 	loaders.style.display = "none";
 	excludeImage.style.display = "none";
+	if (!greenSpot.classList.contains("hide")) greenSpot.classList.toggle("hide");
 }
 
 function stopSlideshow() {
@@ -205,6 +363,7 @@ function stopSlideshow() {
 	loaders.style.display = "block";
 	curIndex.style.display = "block";
 	excludeImage.style.display = "block";
+	if (greenSpot.classList.contains("hide")) greenSpot.classList.toggle("hide");
 }
 
 function reset() {
@@ -220,16 +379,46 @@ function poolSize() {
 	return images.length
 }
 
-function removeCurImage() {
-	rHist.length = ranIndex = 0;
-	if (curIndex.classList.contains("red-border")) curIndex.classList.toggle('red-border');
-	removeItemInSourcesLoaded(images[currentIndex]);
-	images.splice(currentIndex, 1);
+function removeImage(targetIndex) {
+	zapRandomModeIfAny();
+	thumbnailsContainer.querySelector(`img[src="${images[targetIndex]}"]`).parentNode.remove();
+	removeItemInSourcesLoaded(images[targetIndex]);
+	images.splice(targetIndex, 1);
+	updateIndexNums();
 	function removeItemInSourcesLoaded(url) {
 		const tab = String.fromCharCode(9);
 		const nl = String.fromCharCode(10);
 		const lm = String.fromCharCode(92);
 		sources.Loaded = sources.Loaded.replace( RegExp( "(?<=^|" + nl + ")(?:[^" + tab + nl + "]+" + tab + ")?" + url.replace( RegExp( lm + "W", "g"), lm + "$&") + nl), "");
+	}
+}
+
+function zapRandomModeIfAny() {
+	rHist.length = ranIndex = 0;
+	if (curIndex.classList.contains("red-border")) curIndex.classList.toggle('red-border');
+}
+
+function changeThumbnailsSize(theValue, source="slider") {
+	if (source === "mousewheel") {
+		scale += theValue * -0.00025;
+		scale = Math.min(Math.max(.05, scale), 1);
+	} else if (source === "slider") {
+		scale = theValue / 40;
+	} else {
+		return
+	}
+	thumbnailsOuterContainer.querySelector("svg text").textContent = Math.round(scale * 1000) / 10 + "%";
+	const thumbnails = thumbnailsContainer.querySelectorAll(".thumbnail");
+	thumbnails.forEach(thumbnail => {
+		thumbnail.style.width = Math.floor(scale * 100).toString() + "%";
+	});
+}
+
+function updatePosition() {
+	const oc = thumbnailsOuterContainer;
+	if (!oc.classList.contains("hide")) {
+		const rect = oc.getBoundingClientRect();
+		darkSpot.style.top = oc.scrollTop + (rect.bottom - rect.top) / 2;
 	}
 }
 
@@ -240,12 +429,23 @@ document.addEventListener('keydown', (event) => {
 		if (images.length) showNextSlide();
 	} else if (event.code === 'ArrowLeft') {
 		if (images.length) showPrevSlide();
+	} else if (event.code === 'F2') {
+		thumbnailsOuterContainer.classList.toggle("hide");
+		if (!isPlaying) greenSpot.classList.toggle("hide");
 	}
 });
 
 document.addEventListener('click', (event) => {
 	if (!event.target.closest(".setting")) togglePlayPause();
 });
+
+thumbnailsOuterContainer.querySelector("svg").addEventListener("wheel", function(event){
+	event.preventDefault();
+	changeThumbnailsSize(event.deltaY, 'mousewheel');
+}, {passive: false});
+
+thumbnailsOuterContainer.addEventListener("scroll", updatePosition);
+window.addEventListener("resize", updatePosition);
 
 </script>
 </body>
