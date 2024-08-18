@@ -106,7 +106,7 @@
 	<title>Click me to open the thumbnails panel.</title>
 </svg>
 <div id="curIndex" class="setting" onclick="if (poolSize() > 2) {this.classList.toggle('red-border');if (this.classList.contains('red-border')) showNextSlide();}" oncontextmenu="this.style.display = 'none'; return false"></div>
-<div id="excludeImage" class="setting" onclick="removeImage(currentIndex); if (poolSize()) {showPrevSlide(); showNextSlide()} else {reset()}">Exclude</div>
+<div id="excludeImage" class="setting" onclick="removeImage(currentIndex);">Exclude</div>
 <div id="loaders" style="position: fixed; top: 10px; left: 10px;" onclick="reset(); if (event.target.id.toLowerCase().indexOf('proxy')===-1) document.getElementById(event.target.id).addEventListener('change', handleImage, false);">
 	<label id="proxyFolderLoader" class="setting" for="folderLoader" style="display: block; cursor: pointer; color: white;">Choose Folder</label>
 	<input type="file" id="folderLoader" class="setting" name="imageLoader[]" webkitdirectory directory multiple accept="image/*" style="display: none;"/>
@@ -260,7 +260,7 @@ function thumbnailDrop(event) {
 				targetIndex = images.length;
 			}
 		}
-	} else if (event.target.closest("#thumbnailsContainer")) {
+	} else if (event.target.closest("#thumbnailsOuterContainer")) {
 		bingo = true;
 		if (ctnr.dataset.fromMyself) {
 			finaltarget = "<=> to remove the dragged thumbnail <=>";
@@ -385,6 +385,17 @@ function removeImage(targetIndex) {
 	removeItemInSourcesLoaded(images[targetIndex]);
 	images.splice(targetIndex, 1);
 	updateIndexNums();
+	if (poolSize()) {
+		if (targetIndex == currentIndex) {
+			showPrevSlide();
+			showNextSlide();
+		} else if (targetIndex < currentIndex) {
+			currentIndex -= 1;
+			curIndex.innerText = currentIndex + 1;
+		}
+	} else {
+		reset();
+	}
 	function removeItemInSourcesLoaded(url) {
 		const tab = String.fromCharCode(9);
 		const nl = String.fromCharCode(10);
