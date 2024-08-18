@@ -23,18 +23,18 @@ This is a simple slideshow application that allows users to view images in a sli
    - Arrow Right: Show the next image
    - Arrow Left: Show the previous image
    - Rightclick: Dismiss the index number << rightclick on the index number (located at the top-right corner)
-   - F2: Toggle the thumbnail panel
+   - F2: Toggle the thumbnails panel
    - Mouse-wheel/Touch-slide: Resize the thumbnails << mouse-wheel on (or touch-slide from) the `dark spot` control
 4. Click on `Exclude` to remove the current image from the slideshow.
 5. Click on the index number (located at the top-right corner) to toggle random order playing.
-6. Click on the `green spot` control to open the thumbnail panel. (Click on the `dark spot` control to close the thumbnail panel.)
-7. Drag and drop images within the thumbnail panel to reorder or remove them.
-8. Click on an image in the thumbnail panel to jump to it in the slideshow. (This also close the thumbnail panel and enters Pause mode.)
+6. Click on the `green spot` control to open the thumbnails panel. (Click on the `dark spot` control to close the thumbnails panel.)
+7. Drag and drop images within the thumbnails panel to reorder or remove them.
+8. Click on an image in the thumbnails panel to jump to it in the slideshow. (This also close the thumbnails panel and enters pause-mode.)
 9. Use the mouse wheel or "touch slider" to resize thumbnails. (Note: the touch-slider is "invisible", just slide from the `dark spot` to see)
 
-## Thumbnail Panel
+## Thumbnails Panel
 
-The thumbnail panel provides an overview of the images included in the slideshow. You can reorganize them by drag and drop to change their sequential order, insert new images, and remove images. You can also jump to a particular image by clicking on its thumbnail.
+The thumbnails panel provides an overview of the images included in the slideshow. You can reorganize them by drag and drop to change their sequential order, insert new images, and remove images. You can also jump to a particular image by clicking on its thumbnail.
 
 ### Reordering Thumbnails
 
@@ -42,7 +42,7 @@ Moving a thumbnail (changing the sequential order of the loaded images) through 
 
 ### Inserting Images
 
-Insert images by dragging them from a webpage or file explorer and dropping them at the desired point in the list. To insert at the top or bottom of the list, land the image on the empty space (green background). Landing on the lower half of the panel inserts it at the end, while the upper half inserts it at the top. (Note: while this drag&drop allows you to place the payload at the desired point, the drag&drop on the slideshow (not the thumbnail panel) remains appending the payload at the end.)
+Insert images by dragging them from a webpage or file explorer and dropping them at the desired point in the list. To insert at the top or bottom of the list, land the image on the empty space (green background). Landing on the lower half of the panel inserts it at the end, while the upper half inserts it at the top. (Note: while this drag&drop allows you to place the payload at the desired point, the drag&drop on the slideshow (not the thumbnails panel) remains appending the payload at the end.)
 
 ### Removing Thumbnails
 
@@ -63,7 +63,9 @@ The percentage shown in the `dark spot` of the panel indicates the current size 
 - you can exclude the current image from the slideshow. the control is located at the bottom-right corner. it will be shown at pause-mode. besides, since this feature will impact what has been recorded in the random order history (if any), so i took a simple solution, that is, to purge the random order history and force it back to chronological order if it was on random order when `Exclude` was clicked. but why bother adding this feature: with this feature, you may just `Choose Folder` (i.e. load all images in that folder) and exclude those images you don't want by clicking `Exclude` after everything is loaded. for some occasions, this way may be easier than using `Choose Files`. that said, the main usage probably is, using this feature to exclude a few images, as necessity arises on the spot, rather than redoing the loading process all again.
 - can `drop` image(s) onto the slideshow. if the source (image) is already existing in the slideshow, the dropped image will be skipped to avoid duplication of the same image in the slideshow. this feature should work on both "drag from webpage" and "drag from file explorer". remark: for webpage, "dragging a single image" is intuitive whereas "dragging multiple images" is accomplished by dragging a text-range-selection which covered multiple images.
 
-##Change log:
+## Change log:
+
+* Aug 18, 2024&nbsp;&nbsp;&nbsp;&nbsp;bugs fixed.
 
 * Aug 14, 2024&nbsp;&nbsp;&nbsp;&nbsp;added the thumbnails panel (a feature for organizing the images in the slideshow).
 
