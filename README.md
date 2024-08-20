@@ -65,6 +65,8 @@ The percentage shown in the `dark spot` of the panel indicates the current size 
 
 ## Change log:
 
+* Aug 20, 2024&nbsp;&nbsp;&nbsp;&nbsp;another bug fixed.
+
 * Aug 18, 2024&nbsp;&nbsp;&nbsp;&nbsp;bugs fixed.
 
 * Aug 14, 2024&nbsp;&nbsp;&nbsp;&nbsp;added the thumbnails panel (a feature for organizing the images in the slideshow).
