@@ -363,7 +363,7 @@ function stopSlideshow() {
 	loaders.style.display = "block";
 	curIndex.style.display = "block";
 	excludeImage.style.display = "block";
-	if (greenSpot.classList.contains("hide")) greenSpot.classList.toggle("hide");
+	if (greenSpot.classList.contains("hide") === thumbnailsOuterContainer.classList.contains("hide")) greenSpot.classList.toggle("hide");
 }
 
 function reset() {
