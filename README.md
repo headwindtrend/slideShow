@@ -63,6 +63,8 @@ The percentage shown in the `dark spot` of the panel indicates the current size 
 - you can exclude the current image from the slideshow. the control is located at the bottom-right corner. it will be shown at pause-mode. besides, since this feature will impact what has been recorded in the random order history (if any), so i took a simple solution, that is, to purge the random order history and force it back to chronological order if it was on random order when `Exclude` was clicked. but why bother adding this feature: with this feature, you may just `Choose Folder` (i.e. load all images in that folder) and exclude those images you don't want by clicking `Exclude` after everything is loaded. for some occasions, this way may be easier than using `Choose Files`. that said, the main usage probably is, using this feature to exclude a few images, as necessity arises on the spot, rather than redoing the loading process all again.
 - can `drop` image(s) onto the slideshow. if the source (image) is already existing in the slideshow, the dropped image will be skipped to avoid duplication of the same image in the slideshow. this feature should work on both "drag from webpage" and "drag from file explorer". remark: for webpage, "dragging a single image" is intuitive whereas "dragging multiple images" is accomplished by dragging a text-range-selection which covered multiple images.
 
+If you appreciate my work, i will be very grateful if you can support my work by making small sum donation thru PayPal with `Send payment to` entered as `headwindtrend@gmail.com`. Thank you very much for your support.
+
 ## Change log:
 
 * Aug 20, 2024&nbsp;&nbsp;&nbsp;&nbsp;another bug fixed.
