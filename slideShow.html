@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>Simple Slideshow</title>
+<title>Simple Slideshow with Transitions</title>
 <style>
 	body, html {
 		margin: 0;
@@ -20,6 +20,52 @@
 		max-width: 100%;
 		max-height: 100%;
 		object-fit: contain;
+		/* Ensure the animation fills the element */
+		animation-fill-mode: both;
+	}
+	/* Transition CSS Keyframes */
+	@keyframes fadeIn {
+		from { opacity: 0; }
+		to   { opacity: 1; }
+	}
+	@keyframes slideInLeft {
+		from { transform: translateX(-100%); opacity: 0; }
+		to   { transform: translateX(0); opacity: 1; }
+	}
+	@keyframes slideInRight {
+		from { transform: translateX(100%); opacity: 0; }
+		to   { transform: translateX(0); opacity: 1; }
+	}
+	@keyframes zoomIn {
+		from { transform: scale(0.5); opacity: 0; }
+		to   { transform: scale(1); opacity: 1; }
+	}
+	@keyframes flipIn {
+		from { transform: rotateY(90deg); opacity: 0; }
+		to   { transform: rotateY(0deg); opacity: 1; }
+	}
+	/* Additional Transitions */
+	@keyframes bounceIn {
+		0%   { opacity: 0; transform: scale(0.3); }
+		50%  { opacity: 0.9; transform: scale(1.1); }
+		70%  { transform: scale(0.9); }
+		100% { opacity: 1; transform: scale(1); }
+	}
+	@keyframes rotateIn {
+		from { transform: rotate(-360deg); opacity: 0; }
+		to   { transform: rotate(0deg); opacity: 1; }
+	}
+	@keyframes slideInTop {
+		from { transform: translateY(-100%); opacity: 0; }
+		to   { transform: translateY(0); opacity: 1; }
+	}
+	@keyframes slideInBottom {
+		from { transform: translateY(100%); opacity: 0; }
+		to   { transform: translateY(0); opacity: 1; }
+	}
+	@keyframes skewIn {
+		from { transform: skewX(30deg); opacity: 0; }
+		to   { transform: skewX(0deg); opacity: 1; }
 	}
 	#curIndex {
 		position: fixed;
@@ -137,6 +183,20 @@ const sources = {Loaded: ""};
 let scale = 0.375; thumbnailsOuterContainer.querySelector("svg text").textContent = (scale * 100) + "%";
 
 const slideElement = document.getElementById('slide');
+
+// Function to apply a random transition effect using CSS animations
+function applyRandomTransition() {
+	const transitions = [
+		'fadeIn', 'slideInLeft', 'slideInRight', 'zoomIn', 'flipIn',
+		'bounceIn', 'rotateIn', 'slideInTop', 'slideInBottom', 'skewIn'
+	];
+	const randomTransition = transitions[Math.floor(Math.random() * transitions.length)];
+	// Remove any ongoing animation value to force restart
+	slideElement.style.animation = 'none';
+	// Force reflow to restart the animation
+	void slideElement.offsetWidth;
+	slideElement.style.animation = randomTransition + " 1s";
+}
 
 function handleImage(e) {
 	let files = e.target.files;
@@ -325,6 +385,7 @@ function showNextSlide() {
 	}
 	slideElement.src = images[currentIndex];
 	curIndex.innerText = currentIndex + 1;
+	applyRandomTransition();
 }
 
 function showPrevSlide() {
@@ -336,6 +397,7 @@ function showPrevSlide() {
 	}
 	slideElement.src = images[currentIndex];
 	curIndex.innerText = currentIndex + 1;
+	applyRandomTransition();
 }
 
 function togglePlayPause() {
