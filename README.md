@@ -67,6 +67,8 @@ If you appreciate my work, i will be very grateful if you can support my work by
 
 ## Change log:
 
+* Feb 22, 2025&nbsp;&nbsp;&nbsp;&nbsp;added the feature "random transition" which happens when the slideshow switches image (i.e. change from an image to another image). just a visual effect yet hopefully can make the show somewhat "interesting" than without.
+
 * Aug 20, 2024&nbsp;&nbsp;&nbsp;&nbsp;another bug fixed.
 
 * Aug 18, 2024&nbsp;&nbsp;&nbsp;&nbsp;bugs fixed.
